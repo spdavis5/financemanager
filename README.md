@@ -119,50 +119,13 @@ Only `docker compose down -v` deletes the data volume.
 
 ## Development Setup
 
-### Prerequisites
+For local development without Docker, see the individual `package.json` files in `client/` and `server/` directories.
 
-- Node.js 20+
-- PostgreSQL 15+ (or use Docker)
+For most users, just use Docker:
 
-### Local Development
-
-1. Start PostgreSQL:
-
-   ```bash
-   docker run -d --name finance-db \
-     -e POSTGRES_USER=ledger \
-     -e POSTGRES_PASSWORD=ledger_secret_2026 \
-     -e POSTGRES_DB=marital_ledger \
-     -p 5432:5432 \
-     postgres:15-alpine
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   cd server && npm install
-   cd ../client && npm install
-   ```
-
-3. Set up the database:
-
-   ```bash
-   cd server
-   npx prisma generate
-   npx prisma migrate deploy
-   npx tsx src/seed.ts
-   ```
-
-4. Start development servers:
-
-   ```bash
-   # From project root
-   npm run dev
-   ```
-
-   - Backend API: http://localhost:3001
-   - Frontend: http://localhost:5173
+```bash
+docker compose up -d --build
+```
 
 ## API Reference
 
