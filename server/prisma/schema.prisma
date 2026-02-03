@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Tracks the financial state for a specific month
+model MonthlyData {
+  id                Int               @id @default(autoincrement())
+  month             String            // Format: "YYYY-MM"
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  incomeSources     IncomeSource[]
+  expenseCategories ExpenseCategory[]
+
+  @@unique([month])
+}
+
+// Individual income entries per month
+model IncomeSource {
+  id            Int         @id @default(autoincrement())
+  name          String
+  expected      Decimal     @db.Decimal(10, 2)
+  actual        Decimal     @default(0) @db.Decimal(10, 2)
+  monthlyDataId Int
+  monthlyData   MonthlyData @relation(fields: [monthlyDataId], references: [id], onDelete: Cascade)
+}
+
+// Expense tracking per month
+model ExpenseCategory {
+  id             Int         @id @default(autoincrement())
+  name           String
+  budgeted       Decimal     @db.Decimal(10, 2)
+  actual         Decimal     @default(0) @db.Decimal(10, 2)
+  isPaid         Boolean     @default(false)
+  showPaidStatus Boolean     @default(false)
+  monthlyDataId  Int
+  monthlyData    MonthlyData @relation(fields: [monthlyDataId], references: [id], onDelete: Cascade)
+}
+
+// Global savings targets (not tied to specific months)
+model SavingsGoal {
+  id            Int      @id @default(autoincrement())
+  name          String
+  targetAmount  Decimal  @db.Decimal(10, 2)
+  currentAmount Decimal  @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Single user account for authentication
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String   // bcrypt hashed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
